@@ -14,6 +14,13 @@ var messages = []
 // Socket Logic
 io.on('connection', (socket) => {
 
+    // birisi odaya girdiğinde xx Odaya girdi.
+    // birisi odadan çıktığında xx Odadan çıktı.
+    // birisi mesaj yazıyorsa , XX yazıyor... desin
+    // front-end yapılabilir bootstrap ile
+    // kaç kişi bağlı olduğu yazabilir (36) kişi şuan odada
+        
+
     socket.emit('init-messages', (messages))
 
     socket.on('disconnect', () => {
