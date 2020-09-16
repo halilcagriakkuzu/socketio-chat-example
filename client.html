@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chat Odası</title>
+</head>
+<body>
+    <div id="app">
+        <div v-if="!isLoggedIn">
+            <h3>Kullanıcı adını gir:</h3>
+            <input type="text" v-model="username" @keyup.enter="createUser">
+        </div>
+
+        <div v-if="isLoggedIn">
+            <h3>Kullanıcı : {{ username }}</h3>
+
+            <ul>
+                <li v-for="message in messages">
+                    <strong>{{ message.username }}:</strong> {{ message.body }}
+                </li>
+            </ul>
+
+            <input type="text" v-model="newMessageText" @keyup.enter="sendMessage">
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        var socket = io()
+        new Vue({
+            el: '#app',
+            data: {
+                username: null,
+                isLoggedIn: false,
+                messages: [],
+                newMessageText: null,
+            },
+            created() {
+                socket.on('init-messages', (data) => {
+                    this.messages = data
+                })
+
+                socket.on('chat-message', (data) => {
+                    this.messages.push({
+                        body: data.body,
+                        username: data.username
+                    })
+                })
+            },
+            methods: {
+                sendMessage() {
+                    this.messages.push({
+                        body: this.newMessageText,
+                        username: 'Ben'
+                    })
+
+                    socket.emit('chat-message', {
+                        body: this.newMessageText,
+                        username: this.username
+                    })
+
+                    this.newMessageText = null
+                },
+                createUser() {
+                    this.isLoggedIn = true
+                }
+            }
+        })
+    </script>
+</body>
+</html>
